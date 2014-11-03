@@ -237,5 +237,5 @@ app.use(function * () {
 
 ## License
 
-[MIT](https://github.com/pebble/yieldb/blob/master/LICENSE)
+[MIT](https://github.com/pebble/koa-bunyan-logger/blob/master/LICENSE)
 
