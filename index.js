@@ -193,3 +193,58 @@ function updateFields (ctx, func, data, err) {
     return data;
   }
 }
+
+/**
+ * Middleware which adds methods this.time(label) and this.timeEnd(label)
+ * to koa context.
+ *
+ * Parameters:
+ * - opts: object with the following optional properties
+ *   - logLevel: name of log level to use; defaults to 'trace'
+ *   - updateLogFields: function which will be called with
+ *     arguments (fields) in koa context; can update fields or
+ *     return a new object.
+ *
+ * Must use(koaBunyanLogger()) before using this middleware.
+ */
+module.exports.timeContext = function (opts) {
+  opts = opts || {};
+
+  var logLevel = opts.logLevel || 'trace';
+
+  return function* (next) {
+    var ctx = this;
+    var startTimes = {};
+
+    this.time = function (label) {
+      if (startTimes[label]) {
+        ctx.log.warn('time() called for previously used label %s', label);
+      }
+
+      startTimes[label] = new Date().getTime();
+    };
+
+    this.timeEnd = function (label) {
+      var startTime = startTimes[label];
+
+      if (!startTime) { // whoops!
+        ctx.log.warn('timeEnd() called without time() for label %s', label);
+        return;
+      }
+
+      var duration = new Date().getTime() - startTime;
+      var fields = {
+        label: label,
+        duration: duration,
+        msg: label + ': ' + duration + 'ms'
+      };
+
+      fields = updateFields(ctx, opts.updateLogFields, fields);
+      ctx.log[logLevel](fields);
+
+      startTimes[label] = null;
+    };
+
+    yield* next; // jshint ignore:line
+  };
+};

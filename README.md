@@ -231,6 +231,68 @@ app.use(function * () {
 });
 ```
 
+### koaBunyanLogger.timeContext(opts)
+
+Adds `time(label)` and `timeEnd(label)` methods to the koa
+context, which records the time between the time() and
+timeEnd() calls for a given label.
+
+Calls to time() and timeEnd() can be nested or interleaved
+as long as they're balanced for each label.
+
+Options:
+- logLevel: name of log level to use; defaults to 'trace'
+- updateLogFields: function which will be called with
+    arguments (fields) in koa context; can update fields or
+    return a new object.
+
+#### Examples
+
+```js
+var koaBunyanLogger = require('koa-bunyan-logger');
+
+app.use(koaBunyanLogger());
+app.use(koaBunyanLogger.requestIdContext());
+app.use(koaBunyanLogger.timeContext());
+
+app.use(function * () {
+  this.time('get data');
+  var user = yield getUser();
+  var friends = yield getFriend(user);
+  this.timeEnd('get data');
+
+  this.time('serialize');
+  this.body = serialize(user, friends);
+  this.timeEnd('serialize');
+});
+```
+
+Example output:
+```json
+{"name":"koa","hostname":"localhost","pid":9228,"level":10,"label":"get data","duration":102,"msg":"","time":"2014-11-07T01:45:53.711Z","v":0}
+{"name":"koa","hostname":"localhost","pid":9228,"level":10,"label":"serialize","duration":401,"msg":"","time":"2014-11-07T01:45:54.116Z","v":0}
+```
+
+To return different fields, such as nesting the data under
+a single field, add a `updateLogFields` function to the options:
+
+```js
+var koaBunyanLogger = require('koa-bunyan-logger');
+
+app.use(koaBunyanLogger());
+app.use(koaBunyanLogger.requestIdContext());
+app.use(koaBunyanLogger.timeContext({
+  updateLogFields: function (fields) {
+    return {
+      request_trace: {
+        name: fields.label,
+        time: fields.duration
+      }
+    };
+  }
+}));
+```
+
 ## Sponsored by
 
 [Pebble Technology!](https://getpebble.com)
