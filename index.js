@@ -211,40 +211,47 @@ module.exports.timeContext = function (opts) {
   opts = opts || {};
 
   var logLevel = opts.logLevel || 'trace';
+  var updateLogFields = opts.updateLogFields;
 
   return function* (next) {
-    var ctx = this;
-    var startTimes = {};
+    this._timeContextStartTimes = {};
 
-    this.time = function (label) {
-      if (startTimes[label]) {
-        ctx.log.warn('time() called for previously used label %s', label);
-      }
-
-      startTimes[label] = new Date().getTime();
-    };
-
-    this.timeEnd = function (label) {
-      var startTime = startTimes[label];
-
-      if (!startTime) { // whoops!
-        ctx.log.warn('timeEnd() called without time() for label %s', label);
-        return;
-      }
-
-      var duration = new Date().getTime() - startTime;
-      var fields = {
-        label: label,
-        duration: duration,
-        msg: label + ': ' + duration + 'ms'
-      };
-
-      fields = updateFields(ctx, opts.updateLogFields, fields);
-      ctx.log[logLevel](fields);
-
-      startTimes[label] = null;
-    };
+    this.time = time;
+    this.timeEnd = timeEnd;
 
     yield* next; // jshint ignore:line
   };
+
+  function time (label) {
+    var startTimes = this._timeContextStartTimes;
+
+    if (startTimes[label]) {
+      this.log.warn('time() called for previously used label %s', label);
+    }
+
+    startTimes[label] = new Date().getTime();
+  }
+
+  function timeEnd (label) {
+    var startTimes = this._timeContextStartTimes;
+    var startTime = startTimes[label];
+
+    if (!startTime) { // whoops!
+      this.log.warn('timeEnd() called without time() for label %s', label);
+      return;
+    }
+
+    var duration = new Date().getTime() - startTime;
+    var fields = {
+      label: label,
+      duration: duration,
+      msg: label + ': ' + duration + 'ms'
+    };
+
+    fields = updateFields(this, updateLogFields, fields);
+    this.log[logLevel](fields);
+
+    startTimes[label] = null;
+  }
 };
+
