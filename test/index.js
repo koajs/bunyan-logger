@@ -21,7 +21,8 @@ describe('koaBunyanLogger', function () {
       name: 'test',
       streams: [{
         type: 'raw',
-        stream: ringBuffer
+        stream: ringBuffer,
+        level: 'trace'
       }]
     });
   });
@@ -220,6 +221,95 @@ describe('koaBunyanLogger', function () {
       yield request().get('/').expect(200).end();
 
       assert.equal(ringBuffer.records[0].req_id.length, 36);
+    });
+  });
+
+  describe('koaBunyanLogger.timeContext', function () {
+    it('records the time between time() and timeEnd()', function *() {
+      app.use(koaBunyanLogger(ringLogger));
+      app.use(koaBunyanLogger.timeContext());
+
+      app.use(function *() {
+        this.time('foo');
+        this.timeEnd('foo');
+        this.body = '';
+      });
+
+      yield request().get('/').expect(200).end();
+      assert.equal(ringBuffer.records[0].label, 'foo');
+      assert.equal(typeof ringBuffer.records[0].duration, 'number');
+    });
+
+    it('handles nested calls to time()', function *() {
+      app.use(koaBunyanLogger(ringLogger));
+      app.use(koaBunyanLogger.timeContext());
+
+      app.use(function *() {
+        this.time('foo');
+        this.time('bar');
+        this.timeEnd('bar');
+        this.timeEnd('foo');
+        this.body = '';
+      });
+
+      yield request().get('/').expect(200).end();
+      assert.equal(ringBuffer.records[0].label, 'bar');
+      assert.equal(typeof ringBuffer.records[0].duration, 'number');
+      assert.equal(ringBuffer.records[1].label, 'foo');
+      assert.equal(typeof ringBuffer.records[1].duration, 'number');
+    });
+
+    it('warns if time() is called twice for the same label', function *() {
+      app.use(koaBunyanLogger(ringLogger));
+      app.use(koaBunyanLogger.timeContext());
+
+      app.use(function *() {
+        this.time('x');
+        this.time('x');
+        this.body = '';
+      });
+
+      yield request().get('/').expect(200).end();
+      assert.equal(ringBuffer.records[0].level, bunyan.WARN);
+      assert.ok(ringBuffer.records[0].msg.match(/called for previously/));
+    });
+
+    it('warns if timeEnd(label) is called without time(label)', function *() {
+      app.use(koaBunyanLogger(ringLogger));
+      app.use(koaBunyanLogger.timeContext());
+
+      app.use(function *() {
+        this.timeEnd('blam');
+        this.body = '';
+      });
+
+      yield request().get('/').expect(200).end();
+      assert.equal(ringBuffer.records[0].level, bunyan.WARN);
+      assert.ok(ringBuffer.records[0].msg.match(/called without/));
+    });
+
+    it('allows returning custom log fields', function *() {
+      app.use(koaBunyanLogger(ringLogger));
+      app.use(koaBunyanLogger.timeContext({
+        updateLogFields: function (fields) {
+          return {
+            request_trace: {
+              name: fields.label,
+              time: fields.duration
+            }
+          };
+        }
+      }));
+
+      app.use(function *() {
+        this.time('foo');
+        this.timeEnd('foo');
+        this.body = '';
+      });
+
+      yield request().get('/').expect(200).end();
+      assert.equal(ringBuffer.records[0].request_trace.name, 'foo');
+      assert.equal(typeof ringBuffer.records[0].request_trace.time, 'number');
     });
   });
 });
