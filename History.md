@@ -1,4 +1,9 @@
 
+1.1.0 / 2014-11-10
+==================
+
+ * Add timeContext() utility to enable this.time() and this.timeEnd()
+
 1.0.1 / 2014-11-03
 ==================
 
