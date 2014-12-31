@@ -7,6 +7,10 @@ Inspired by [koa-bunyan](https://github.com/ivpusic/koa-bunyan),
 [koa-json-logger](https://github.com/rudijs/koa-json-logger),
 [bunyan-request](https://github.com/vvo/bunyan-request), and others.
 
+[![Build Status](https://travis-ci.org/pebble/koa-bunyan-logger.svg?branch=master)](https://travis-ci.org/pebble/koa-bunyan-logger)
+[![Coverage Status](https://coveralls.io/repos/pebble/koa-bunyan-logger/badge.png)](https://coveralls.io/r/pebble/koa-bunyan-logger)
+[![npm](http://img.shields.io/npm/v/koa-bunyan-logger.svg)](https://www.npmjs.org/package/koa-bunyan-logger)
+
 A primary goal of this module is to be as flexible as possible, while
 remaining relatively lightweight, leaving advanced functionality and
 customization the app.
