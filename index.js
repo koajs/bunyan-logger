@@ -223,6 +223,7 @@ module.exports.timeContext = function (opts) {
   };
 
   function time (label) {
+    /*jshint validthis:true */
     var startTimes = this._timeContextStartTimes;
 
     if (startTimes[label]) {
@@ -233,6 +234,7 @@ module.exports.timeContext = function (opts) {
   }
 
   function timeEnd (label) {
+    /*jshint validthis:true */
     var startTimes = this._timeContextStartTimes;
     var startTime = startTimes[label];
 
