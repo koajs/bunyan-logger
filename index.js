@@ -26,15 +26,15 @@ function createOrUseLogger(logger) {
  * containing a bunyan logger instance.
  *
  * Parameters:
- *  - logger: bunyan logger instance, or an object with properties
- *            that will be passed to bunyan.createLogger. If not
- *            specified, a default logger will be used.
+ *  - loggerInstance: bunyan logger instance, or an object with properties
+ *                    that will be passed to bunyan.createLogger. If not
+ *                    specified, a default logger will be used.
  */
-module.exports = function (logger) {
-  logger = createOrUseLogger(logger);
+module.exports = function (loggerInstance) {
+  loggerInstance = createOrUseLogger(loggerInstance);
 
-  return function *(next) {
-    this.log = logger;
+  return function *logger(next) {
+    this.log = loggerInstance;
 
     yield *next; // jshint ignore:line
   };
@@ -63,7 +63,7 @@ module.exports.requestIdContext = function (opts) {
   var logField = opts.field || 'req_id';
   var fallbackLogger;
 
-  return function * (next) {
+  return function *requestIdContext(next) {
     var reqId = this.request.get(header) || uuid.v4();
 
     this[ctxProp] = reqId;
@@ -123,7 +123,7 @@ module.exports.requestLogger = function (opts) {
                        this.status, data[durationField]);
   };
 
-  return function *(next) {
+  return function *requestLogger(next) {
     var url = this.url;
 
     var requestData = {
@@ -213,7 +213,7 @@ module.exports.timeContext = function (opts) {
   var logLevel = opts.logLevel || 'trace';
   var updateLogFields = opts.updateLogFields;
 
-  return function* (next) {
+  return function *timeContext(next) {
     this._timeContextStartTimes = {};
 
     this.time = time;
