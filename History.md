@@ -1,4 +1,9 @@
 
+1.1.1 / 2015-01-13
+==================
+
+ * use named middleware for better debugging #4 [mpal9000](https://github.com/mpal9000)
+
 1.1.0 / 2014-11-10
 ==================
 
