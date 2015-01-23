@@ -1,4 +1,10 @@
 
+1.2.0 / 2015-01-23
+==================
+
+  * Merge pull request #5 from pebble/standard-req-res
+  * Pass this.req/this.res instead of this.request/this.response
+
 1.1.1 / 2015-01-13
 ==================
 
