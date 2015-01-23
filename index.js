@@ -140,8 +140,8 @@ module.exports.requestLogger = function (opts) {
 
     var onResponseFinished = function () {
       var responseData = {
-        req: this.request,
-        res: this.response
+        req: this.req,
+        res: this.res
       };
 
       if (err) {

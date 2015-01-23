@@ -88,7 +88,7 @@ describe('koaBunyanLogger', function () {
       assert.equal(ringBuffer.records.length, 2);
       assert.ok(record(0).msg.match(REQ_MESSAGE));
       assert.ok(record(1).msg.match(RES_MESSAGE));
-      assert.equal(record(1).res.status, status);
+      assert.equal(record(1).res.statusCode, status);
     }
 
     it('logs requests', function *() {
@@ -185,7 +185,7 @@ describe('koaBunyanLogger', function () {
       assert.ok(record(1).msg.match('clumsy'));
 
       assert.ok(record(2).msg.match(RES_MESSAGE));
-      assert.equal(record(2).res.status, 200);
+      assert.equal(record(2).res.statusCode, 200);
     });
   });
 
