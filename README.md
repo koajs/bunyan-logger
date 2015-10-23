@@ -297,6 +297,15 @@ app.use(koaBunyanLogger.timeContext({
 }));
 ```
 
+### bunyan export
+
+The internal copy of bunyan is exported as `.bunyan`:
+
+```js
+var koaBunyanLogger = require('koa-bunyan-logger');
+var bunyan = koaBunyanLogger.bunyan;
+```
+
 ## Sponsored by
 
 [Pebble Technology!](https://getpebble.com)

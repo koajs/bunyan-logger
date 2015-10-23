@@ -257,3 +257,5 @@ module.exports.timeContext = function (opts) {
   }
 };
 
+// Export our copy of bunyan
+module.exports.bunyan = bunyan;
