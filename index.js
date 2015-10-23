@@ -95,7 +95,7 @@ module.exports.requestIdContext = function (opts) {
  *    - updateRequestLogFields: function (requestData)
  *    - updateResponseLogFields: function (responseData)
  *    - formatRequestMessage: function (requestData)
- *    - formatReponseMessage: function (responseData)
+ *    - formatResponseMessage: function (responseData)
  */
 module.exports.requestLogger = function (opts) {
   opts = opts || {};
