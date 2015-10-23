@@ -127,7 +127,7 @@ module.exports.requestLogger = function (opts) {
     var url = this.url;
 
     var requestData = {
-      req: this.request
+      req: this.req
     };
 
     requestData = updateFields(this, opts.updateLogFields, requestData);
