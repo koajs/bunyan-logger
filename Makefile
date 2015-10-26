@@ -8,12 +8,12 @@ lint: index.js
 	@ $(LINT) index.js
 
 test: .PHONY
-	@ node --harmony $(MOCHA)
+	@ node $(MOCHA)
 
 test-cov: .PHONY
-	@ node --harmony $(ISTANBUL) cover $(MOCHA)
+	@ node $(ISTANBUL) cover $(MOCHA)
 
 test-travis: lint test-cov
-	@ node --harmony $(ISTANBUL) check-coverage
+	@ node $(ISTANBUL) check-coverage
 
 .PHONY:

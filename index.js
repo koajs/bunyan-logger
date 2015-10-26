@@ -95,7 +95,7 @@ module.exports.requestIdContext = function (opts) {
  *    - updateRequestLogFields: function (requestData)
  *    - updateResponseLogFields: function (responseData)
  *    - formatRequestMessage: function (requestData)
- *    - formatReponseMessage: function (responseData)
+ *    - formatResponseMessage: function (responseData)
  */
 module.exports.requestLogger = function (opts) {
   opts = opts || {};
@@ -127,7 +127,7 @@ module.exports.requestLogger = function (opts) {
     var url = this.url;
 
     var requestData = {
-      req: this.request
+      req: this.req
     };
 
     requestData = updateFields(this, opts.updateLogFields, requestData);
@@ -257,3 +257,5 @@ module.exports.timeContext = function (opts) {
   }
 };
 
+// Export our copy of bunyan
+module.exports.bunyan = bunyan;
