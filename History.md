@@ -1,4 +1,11 @@
 
+1.3.0 / 2015-10-26
+==================
+
+  * Bump bunyan to 1.5.0, bump test dependencies
+  * Export bunyan
+  * Fix req object (was incorrectly using koa's request object)
+
 1.2.0 / 2015-01-23
 ==================
 
