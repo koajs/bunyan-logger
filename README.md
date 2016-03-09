@@ -1,4 +1,4 @@
-# koa-bunyan-logger
+# bunyan-logger
 
 Flexible log context and request logging middleware
 for [koa](http://koajs.com/) using [bunyan](https://github.com/trentm/node-bunyan).
@@ -7,8 +7,8 @@ Inspired by [koa-bunyan](https://github.com/ivpusic/koa-bunyan),
 [koa-json-logger](https://github.com/rudijs/koa-json-logger),
 [bunyan-request](https://github.com/vvo/bunyan-request), and others.
 
-[![Build Status](https://travis-ci.org/pebble/koa-bunyan-logger.svg?branch=master)](https://travis-ci.org/pebble/koa-bunyan-logger)
-[![Coverage Status](https://coveralls.io/repos/pebble/koa-bunyan-logger/badge.png)](https://coveralls.io/r/pebble/koa-bunyan-logger)
+[![Build Status](https://travis-ci.org/koajs/bunyan-logger.svg?branch=master)](https://travis-ci.org/koajs/bunyan-logger)
+[![Coverage Status](https://coveralls.io/repos/koajs/bunyan-logger/badge.png)](https://coveralls.io/r/koajs/bunyan-logger)
 [![npm](http://img.shields.io/npm/v/koa-bunyan-logger.svg)](https://www.npmjs.org/package/koa-bunyan-logger)
 
 A primary goal of this module is to be as flexible as possible, while
@@ -308,9 +308,8 @@ var bunyan = koaBunyanLogger.bunyan;
 
 ## Sponsored by
 
-[Pebble Technology!](https://getpebble.com)
+[Pebble Technology!](https://www.pebble.com)
 
 ## License
 
-[MIT](https://github.com/pebble/koa-bunyan-logger/blob/master/LICENSE)
-
+[MIT](https://github.com/koajs/bunyan-logger/blob/master/LICENSE)

@@ -18,12 +18,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/pebble/koa-bunyan-logger.git"
+    "url": "https://github.com/koajs/bunyan-logger.git"
   },
   "bugs": {
-    "url": "https://github.com/pebble/koa-bunyan-logger/issues"
+    "url": "https://github.com/koajs/bunyan-logger/issues"
   },
-  "homepage": "https://github.com/pebble/koa-bunyan-logger",
+  "homepage": "https://github.com/koajs/bunyan-logger",
   "author": "Pebble Technology <webteam@getpebble.com>",
   "license": "MIT",
   "dependencies": {
