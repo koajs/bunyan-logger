@@ -33,10 +33,10 @@ function createOrUseLogger(logger) {
 module.exports = function (loggerInstance) {
   loggerInstance = createOrUseLogger(loggerInstance);
 
-  return function *logger(next) {
-    this.log = loggerInstance;
+  return function logger(ctx, next) {
+    ctx.log = loggerInstance;
 
-    yield *next; // jshint ignore:line
+    return next();
   };
 };
 
@@ -63,22 +63,22 @@ module.exports.requestIdContext = function (opts) {
   var logField = opts.field || 'req_id';
   var fallbackLogger;
 
-  return function *requestIdContext(next) {
-    var reqId = this.request.get(header) || uuid.v4();
+  return function requestIdContext(ctx, next) {
+    var reqId = ctx.request.get(header) || uuid.v4();
 
-    this[ctxProp] = reqId;
-    this.request[requestProp] = reqId;
+    ctx[ctxProp] = reqId;
+    ctx.request[requestProp] = reqId;
 
     var logFields = {};
     logFields[logField] = reqId;
 
-    if (!this.log) {
+    if (!ctx.log) {
       throw new Error('must use(koaBunyanLogger()) before this middleware');
     }
 
-    this.log = this.log.child(logFields);
+    ctx.log = ctx.log.child(logFields);
 
-    yield *next; // jshint ignore:line
+    return next();
   };
 };
 
@@ -123,25 +123,25 @@ module.exports.requestLogger = function (opts) {
                        this.status, data[durationField]);
   };
 
-  return function *requestLogger(next) {
-    var url = this.url;
+  return function requestLogger(ctx, next) {
+    var url = ctx.url;
 
     var requestData = {
-      req: this.req
+      req: ctx.req
     };
 
-    requestData = updateFields(this, opts.updateLogFields, requestData);
-    requestData = updateFields(this, opts.updateRequestLogFields, requestData);
+    requestData = updateFields(ctx, opts.updateLogFields, requestData);
+    requestData = updateFields(ctx, opts.updateRequestLogFields, requestData);
 
-    this.log.info(requestData, formatRequestMessage.call(this, requestData));
+    ctx.log.info(requestData, formatRequestMessage.call(ctx, requestData));
 
     var startTime = new Date().getTime();
     var err;
 
     var onResponseFinished = function () {
       var responseData = {
-        req: this.req,
-        res: this.res
+        req: ctx.req,
+        res: ctx.res
       };
 
       if (err) {
@@ -150,32 +150,30 @@ module.exports.requestLogger = function (opts) {
 
       responseData[durationField] = new Date().getTime() - startTime;
 
-      responseData = updateFields(this, opts.updateLogFields, responseData);
-      responseData = updateFields(this, opts.updateResponseLogFields,
+      responseData = updateFields(ctx, opts.updateLogFields, responseData);
+      responseData = updateFields(ctx, opts.updateResponseLogFields,
                                   responseData, err);
 
-      var level = levelFn.call(this, this.status, err);
+      var level = levelFn.call(ctx, ctx.status, err);
 
-      this.log[level](responseData,
-                      formatResponseMessage.call(this, responseData));
+      ctx.log[level](responseData,
+                      formatResponseMessage.call(ctx, responseData));
 
       // Remove log object to mitigate accidental leaks
-      this.log = null;
+      ctx.log = null;
     };
 
-    try {
-      yield *next; // jshint ignore:line
-    } catch (e) {
+    return next().catch(e => {
       err = e;
-    } finally {
+    }).then(() => { // Emulate a finally
       // Handle response logging and cleanup when request is finished
       // This ensures that the default error handler is done
-      onFinished(this.response.res, onResponseFinished.bind(this));
-    }
+      onFinished(ctx.response.res, onResponseFinished.bind(ctx));
 
-    if (err) {
-      throw err; // rethrow
-    }
+      if (err) {
+        throw err; // rethrow
+      }
+    });
   };
 };
 
@@ -213,13 +211,13 @@ module.exports.timeContext = function (opts) {
   var logLevel = opts.logLevel || 'trace';
   var updateLogFields = opts.updateLogFields;
 
-  return function *timeContext(next) {
-    this._timeContextStartTimes = {};
+  return function timeContext(ctx, next) {
+    ctx._timeContextStartTimes = {};
 
-    this.time = time;
-    this.timeEnd = timeEnd;
+    ctx.time = time;
+    ctx.timeEnd = timeEnd;
 
-    yield* next; // jshint ignore:line
+    return next();
   };
 
   function time (label) {
