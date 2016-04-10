@@ -1,4 +1,4 @@
-var koa = require('koa');
+var Koa = require('koa');
 var koaBunyanLogger = require('../');
 var supertest = require('supertest');
 var assert = require('assert');
@@ -13,7 +13,7 @@ describe('koaBunyanLogger', function () {
   var ringBuffer;
 
   beforeEach(function *() {
-    app = koa();
+    app = new Koa();
     app.on('error', function () {}); // suppress errors
 
     ringBuffer = new bunyan.RingBuffer({limit: 100});
@@ -49,15 +49,15 @@ describe('koaBunyanLogger', function () {
     return ringBuffer.records[i];
   };
 
-  var helloWorld = function *() {
-    this.body = 'Hello world';
+  var helloWorld = function (ctx) {
+    ctx.body = 'Hello world';
   };
 
   it('creates a default logger', function *() {
     app.use(koaBunyanLogger());
-    app.use(function *() {
-      assert.ok(this.log);
-      this.body = '';
+    app.use(function (ctx) {
+      assert.ok(ctx.log);
+      ctx.body = '';
     });
 
     yield request().get('/').expect(200).end();
@@ -66,9 +66,9 @@ describe('koaBunyanLogger', function () {
   it('can log simple requests', function * () {
     app.use(koaBunyanLogger(ringLogger));
 
-    app.use(function *() {
-      this.log.info('Got request');
-      this.body = 'Hello world';
+    app.use(function (ctx) {
+      ctx.log.info('Got request');
+      ctx.body = 'Hello world';
     });
 
     yield request().get('/').expect(200).end();
@@ -80,7 +80,7 @@ describe('koaBunyanLogger', function () {
     var REQ_MESSAGE = /  <-- GET \//;
     var RES_MESSAGE = /  --> GET \/ \d+ \d+ms/;
 
-    beforeEach(function *() {
+    beforeEach(function () {
       app.use(koaBunyanLogger(ringLogger));
     });
 
@@ -103,8 +103,8 @@ describe('koaBunyanLogger', function () {
     it('logs 404 errors', function *() {
       app.use(koaBunyanLogger.requestLogger());
 
-      app.use(function *() {
-        this.throw(404);
+      app.use(function (ctx) {
+        ctx.throw(404);
       });
 
       yield request().get('/').expect(404).end();
@@ -115,7 +115,7 @@ describe('koaBunyanLogger', function () {
     it('logs 500 errors', function *() {
       app.use(koaBunyanLogger.requestLogger());
 
-      app.use(function *() {
+      app.use(function () {
         throw new Error('oh no');
       });
 
@@ -147,7 +147,7 @@ describe('koaBunyanLogger', function () {
         }
       }));
 
-      app.use(function *() {
+      app.use(function () {
         throw new Error('uh oh');
       });
 
@@ -199,9 +199,9 @@ describe('koaBunyanLogger', function () {
       app.use(koaBunyanLogger(ringLogger));
       app.use(koaBunyanLogger.requestIdContext());
 
-      app.use(function *() {
-        this.log.info('hello world');
-        this.body = "";
+      app.use(function (ctx) {
+        ctx.log.info('hello world');
+        ctx.body = "";
       });
 
       yield request().get('/').set({'X-Request-Id': '1234'}).expect(200).end();
@@ -213,9 +213,9 @@ describe('koaBunyanLogger', function () {
       app.use(koaBunyanLogger(ringLogger));
       app.use(koaBunyanLogger.requestIdContext());
 
-      app.use(function *() {
-        this.log.info('hello world');
-        this.body = "";
+      app.use(function (ctx) {
+        ctx.log.info('hello world');
+        ctx.body = "";
       });
 
       yield request().get('/').expect(200).end();
@@ -229,10 +229,10 @@ describe('koaBunyanLogger', function () {
       app.use(koaBunyanLogger(ringLogger));
       app.use(koaBunyanLogger.timeContext());
 
-      app.use(function *() {
-        this.time('foo');
-        this.timeEnd('foo');
-        this.body = '';
+      app.use(function (ctx) {
+        ctx.time('foo');
+        ctx.timeEnd('foo');
+        ctx.body = '';
       });
 
       yield request().get('/').expect(200).end();
@@ -244,12 +244,12 @@ describe('koaBunyanLogger', function () {
       app.use(koaBunyanLogger(ringLogger));
       app.use(koaBunyanLogger.timeContext());
 
-      app.use(function *() {
-        this.time('foo');
-        this.time('bar');
-        this.timeEnd('bar');
-        this.timeEnd('foo');
-        this.body = '';
+      app.use(function (ctx) {
+        ctx.time('foo');
+        ctx.time('bar');
+        ctx.timeEnd('bar');
+        ctx.timeEnd('foo');
+        ctx.body = '';
       });
 
       yield request().get('/').expect(200).end();
@@ -263,10 +263,10 @@ describe('koaBunyanLogger', function () {
       app.use(koaBunyanLogger(ringLogger));
       app.use(koaBunyanLogger.timeContext());
 
-      app.use(function *() {
-        this.time('x');
-        this.time('x');
-        this.body = '';
+      app.use(function (ctx) {
+        ctx.time('x');
+        ctx.time('x');
+        ctx.body = '';
       });
 
       yield request().get('/').expect(200).end();
@@ -278,9 +278,9 @@ describe('koaBunyanLogger', function () {
       app.use(koaBunyanLogger(ringLogger));
       app.use(koaBunyanLogger.timeContext());
 
-      app.use(function *() {
-        this.timeEnd('blam');
-        this.body = '';
+      app.use(function (ctx) {
+        ctx.timeEnd('blam');
+        ctx.body = '';
       });
 
       yield request().get('/').expect(200).end();
@@ -301,10 +301,10 @@ describe('koaBunyanLogger', function () {
         }
       }));
 
-      app.use(function *() {
-        this.time('foo');
-        this.timeEnd('foo');
-        this.body = '';
+      app.use(function (ctx) {
+        ctx.time('foo');
+        ctx.timeEnd('foo');
+        ctx.body = '';
       });
 
       yield request().get('/').expect(200).end();
