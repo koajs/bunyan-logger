@@ -1,5 +1,7 @@
 # bunyan-logger
 
+NOTE that you're reading the README of the version which targets [Koa v2.x](https://github.com/koajs/koa/tree/v2.x), if you want to read the current version read the README in master branch
+
 Flexible log context and request logging middleware
 for [koa](http://koajs.com/) using [bunyan](https://github.com/trentm/node-bunyan).
 
@@ -22,8 +24,8 @@ var koaBunyanLogger = require('koa-bunyan-logger');
 var app = koa();
 app.use(koaBunyanLogger());
 
-app.use(function *() {
-  this.log.info({'Got a request from %s for %s', this.request.ip, this.path);
+app.use(function (ctx) {
+  ctx.log.info({'Got a request from %s for %s', this.request.ip, this.path);
 });
 
 app.listen(8000);
@@ -31,7 +33,7 @@ app.listen(8000);
 
 Server:
 ```
-node --harmony examples/simple.js | ./node_modules/.bin/bunyan -o short`
+node examples/simple.js | ./node_modules/.bin/bunyan -o short`
 ```
 
 Client:
@@ -54,7 +56,7 @@ app.use(koaBunyanLogger.requestLogger());
 
 Server:
 ```
-node --harmony examples/requests.js | ./node_modules/.bin/bunyan -o short
+node examples/requests.js | ./node_modules/.bin/bunyan -o short
 ```
 
 Client:
@@ -229,9 +231,9 @@ var koaBunyanLogger = require('koa-bunyan-logger');
 app.use(koaBunyanLogger());
 app.use(koaBunyanLogger.requestIdContext());
 
-app.use(function * () {
-  this.response.set('X-Server-Request-Id', this.reqId);
-  this.body = "Hello world";
+app.use(function (ctx) {
+  ctx.response.set('X-Server-Request-Id', this.reqId);
+  ctx.body = "Hello world";
 });
 ```
 
@@ -259,15 +261,44 @@ app.use(koaBunyanLogger());
 app.use(koaBunyanLogger.requestIdContext());
 app.use(koaBunyanLogger.timeContext());
 
-app.use(function * () {
-  this.time('get data');
-  var user = yield getUser();
-  var friends = yield getFriend(user);
-  this.timeEnd('get data');
+app.use(function (ctx) {
+  ctx.time('get data');
 
-  this.time('serialize');
-  this.body = serialize(user, friends);
-  this.timeEnd('serialize');
+  return getUser()
+  .then(u => {
+    return getFriend(u)
+    .then(f => [u, f]);
+  })
+  .then(data => {
+    let user = data[0];
+    let friends = data[1];
+
+    ctx.timeEnd('get data');
+    ctx.time('serialize');
+    ctx.body = serialize(user, friends);
+    ctx.timeEnd('serialize');
+  });
+});
+```
+
+The same but using async functions
+
+```js
+var koaBunyanLogger = require('koa-bunyan-logger');
+
+app.use(koaBunyanLogger());
+app.use(koaBunyanLogger.requestIdContext());
+app.use(koaBunyanLogger.timeContext());
+
+app.use(async function (ctx) {
+  ctx.time('get data');
+  let user = await getUser();
+  let friends = await getFriend(user);
+  ctx.timeEnd('get data');
+
+  ctx.time('serialize');
+  ctx.body = serialize(user, friends);
+  ctx.timeEnd('serialize');
 });
 ```
 
