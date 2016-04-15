@@ -1,4 +1,9 @@
 
+2.0.0-pre1 / 2016-04-15
+=======================
+
+ * Support koa v2 #8 #9 [ifraixedes](https://github.com/ifraixedes)
+
 1.3.0 / 2015-10-26
 ==================
 
