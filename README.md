@@ -154,12 +154,12 @@ Options:
   fields object when logging a response, after processing updateLogFields.
   It also receives a second argument, err, if an error was thrown.
 
-- formatRequestLog: Function which will be called to generate a log message
+- formatRequestMessage: Function which will be called to generate a log message
   for logging requests. The function will be called in the context of the
   koa 'this' context and passed the request fields object. It should return
   a string.
 
-- formatResponseLog: Same as formatRequestLog, but for responses.
+- formatResponseMessage: Same as formatRequestLog, but for responses.
 
 #### Examples
 
