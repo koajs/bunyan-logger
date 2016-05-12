@@ -22,8 +22,9 @@ var koaBunyanLogger = require('koa-bunyan-logger');
 var app = koa();
 app.use(koaBunyanLogger());
 
-app.use(function *() {
-  this.log.info({'Got a request from %s for %s', this.request.ip, this.path);
+app.use(function *(next) {
+  this.log.info('Got a request from %s for %s', this.request.ip, this.path);
+  yield next;
 });
 
 app.listen(8000);
