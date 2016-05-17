@@ -25,7 +25,7 @@ var app = koa();
 app.use(koaBunyanLogger());
 
 app.use(function (ctx) {
-  ctx.log.info({'Got a request from %s for %s', this.request.ip, this.path);
+  ctx.log.info({'Got a request from %s for %s', ctx.request.ip, ctx.path);
 });
 
 app.listen(8000);
@@ -232,7 +232,7 @@ app.use(koaBunyanLogger());
 app.use(koaBunyanLogger.requestIdContext());
 
 app.use(function (ctx) {
-  ctx.response.set('X-Server-Request-Id', this.reqId);
+  ctx.response.set('X-Server-Request-Id', ctx.reqId);
   ctx.body = "Hello world";
 });
 ```
