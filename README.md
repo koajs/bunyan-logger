@@ -113,7 +113,11 @@ Use an existing logger:
 var bunyan = require('bunyan');
 var koaBunyanLogger = require('koa-bunyan-logger');
 
-var appLogger = bunyan.createLogger({name: 'myapp', level: 'debug'});
+var appLogger = bunyan.createLogger({
+  name: 'myapp',
+  level: 'debug',
+  serializers: bunyan.stdSerializers
+});
 
 app.use(koaBunyanLogger(appLogger));
 ```
