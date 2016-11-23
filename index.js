@@ -1,7 +1,7 @@
 'use strict';
 
 var bunyan = require('bunyan');
-var uuid = require('node-uuid');
+var uuid = require('uuid');
 var util = require('util');
 var onFinished = require('on-finished');
 
