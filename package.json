@@ -4,13 +4,12 @@
   "description": "Koa middleware for logging requests using bunyan",
   "main": "index.js",
   "engines": {
-    "node": ">= 0.11.4"
+    "node": ">= 4.x"
   },
   "scripts": {
     "test": "make test"
   },
   "keywords": [
-    "co",
     "koa",
     "bunyan",
     "logging",
@@ -36,7 +35,7 @@
     "co-supertest": "~0.0.10",
     "istanbul": "~0.4.0",
     "jshint": "~2.5.8",
-    "koa": "~1.1.1",
+    "koa": "^2.0.0",
     "mocha": "~2.3.3",
     "supertest": "~1.1.0"
   }
