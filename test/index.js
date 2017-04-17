@@ -5,7 +5,6 @@ var assert = require('assert');
 var bunyan = require('bunyan');
 
 require('co-mocha');
-require('co-supertest');
 
 describe('koaBunyanLogger', function () {
   var app;
@@ -60,7 +59,7 @@ describe('koaBunyanLogger', function () {
       this.body = '';
     });
 
-    yield request().get('/').expect(200).end();
+    yield request().get('/').expect(200);
   });
 
   it('can log simple requests', function * () {
@@ -71,7 +70,7 @@ describe('koaBunyanLogger', function () {
       this.body = 'Hello world';
     });
 
-    yield request().get('/').expect(200).end();
+    yield request().get('/').expect(200);
 
     assert.equal(record(0).msg, 'Got request');
   });
@@ -95,7 +94,7 @@ describe('koaBunyanLogger', function () {
       app.use(koaBunyanLogger.requestLogger());
       app.use(helloWorld);
 
-      yield request().get('/').expect(200).end();
+      yield request().get('/').expect(200);
 
       checkRequestResponse(200);
     });
@@ -107,7 +106,7 @@ describe('koaBunyanLogger', function () {
         this.throw(404);
       });
 
-      yield request().get('/').expect(404).end();
+      yield request().get('/').expect(404);
 
       checkRequestResponse(404);
     });
@@ -119,7 +118,7 @@ describe('koaBunyanLogger', function () {
         throw new Error('oh no');
       });
 
-      yield request().get('/').expect(500).end();
+      yield request().get('/').expect(500);
 
       checkRequestResponse(500);
     });
@@ -151,7 +150,7 @@ describe('koaBunyanLogger', function () {
         throw new Error('uh oh');
       });
 
-      yield request().get('/').expect(500).end();
+      yield request().get('/').expect(500);
 
       checkRequestResponse(500);
 
@@ -175,7 +174,7 @@ describe('koaBunyanLogger', function () {
 
       app.use(helloWorld);
 
-      yield request().get('/').expect(200).end();
+      yield request().get('/').expect(200);
 
       assert.equal(ringBuffer.records.length, 3);
       assert.ok(record(0).msg.match(REQ_MESSAGE));
@@ -192,7 +191,7 @@ describe('koaBunyanLogger', function () {
   describe('koaBunyanLogger.requestIdContext', function () {
     it('throws an exception if this.log is not available', function *() {
       app.use(koaBunyanLogger.requestIdContext());
-      yield request().get('/').expect(500).end();
+      yield request().get('/').expect(500);
     });
 
     it('adds req_id from X-Request-Header to log messages', function *() {
@@ -204,7 +203,7 @@ describe('koaBunyanLogger', function () {
         this.body = "";
       });
 
-      yield request().get('/').set({'X-Request-Id': '1234'}).expect(200).end();
+      yield request().get('/').set({'X-Request-Id': '1234'}).expect(200);
 
       assert.equal(ringBuffer.records[0].req_id, '1234');
     });
@@ -218,7 +217,7 @@ describe('koaBunyanLogger', function () {
         this.body = "";
       });
 
-      yield request().get('/').expect(200).end();
+      yield request().get('/').expect(200);
 
       assert.equal(ringBuffer.records[0].req_id.length, 36);
     });
@@ -235,7 +234,7 @@ describe('koaBunyanLogger', function () {
         this.body = '';
       });
 
-      yield request().get('/').expect(200).end();
+      yield request().get('/').expect(200);
       assert.equal(ringBuffer.records[0].label, 'foo');
       assert.equal(typeof ringBuffer.records[0].duration, 'number');
     });
@@ -252,7 +251,7 @@ describe('koaBunyanLogger', function () {
         this.body = '';
       });
 
-      yield request().get('/').expect(200).end();
+      yield request().get('/').expect(200);
       assert.equal(ringBuffer.records[0].label, 'bar');
       assert.equal(typeof ringBuffer.records[0].duration, 'number');
       assert.equal(ringBuffer.records[1].label, 'foo');
@@ -269,7 +268,7 @@ describe('koaBunyanLogger', function () {
         this.body = '';
       });
 
-      yield request().get('/').expect(200).end();
+      yield request().get('/').expect(200);
       assert.equal(ringBuffer.records[0].level, bunyan.WARN);
       assert.ok(ringBuffer.records[0].msg.match(/called for previously/));
     });
@@ -283,7 +282,7 @@ describe('koaBunyanLogger', function () {
         this.body = '';
       });
 
-      yield request().get('/').expect(200).end();
+      yield request().get('/').expect(200);
       assert.equal(ringBuffer.records[0].level, bunyan.WARN);
       assert.ok(ringBuffer.records[0].msg.match(/called without/));
     });
@@ -307,7 +306,7 @@ describe('koaBunyanLogger', function () {
         this.body = '';
       });
 
-      yield request().get('/').expect(200).end();
+      yield request().get('/').expect(200);
       assert.equal(ringBuffer.records[0].request_trace.name, 'foo');
       assert.equal(typeof ringBuffer.records[0].request_trace.time, 'number');
     });
