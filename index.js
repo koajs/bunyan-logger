@@ -33,10 +33,10 @@ function createOrUseLogger(logger) {
 module.exports = function (loggerInstance) {
   loggerInstance = createOrUseLogger(loggerInstance);
 
-  return function *logger(next) {
+  return function* logger(next) {
     this.log = loggerInstance;
 
-    yield *next; // jshint ignore:line
+    yield* next; // jshint ignore:line
   };
 };
 
@@ -63,7 +63,7 @@ module.exports.requestIdContext = function (opts) {
   var logField = opts.field || 'req_id';
   var fallbackLogger;
 
-  return function *requestIdContext(next) {
+  return function* requestIdContext(next) {
     var reqId = this.request.get(header) || uuid.v4();
 
     this[ctxProp] = reqId;
@@ -78,7 +78,7 @@ module.exports.requestIdContext = function (opts) {
 
     this.log = this.log.child(logFields);
 
-    yield *next; // jshint ignore:line
+    yield* next; // jshint ignore:line
   };
 };
 
@@ -96,6 +96,7 @@ module.exports.requestIdContext = function (opts) {
  *    - updateResponseLogFields: function (responseData)
  *    - formatRequestMessage: function (requestData)
  *    - formatResponseMessage: function (responseData)
+ *    - ignorePath: ignore of path
  */
 module.exports.requestLogger = function (opts) {
   opts = opts || {};
@@ -114,17 +115,20 @@ module.exports.requestLogger = function (opts) {
 
   var formatRequestMessage = opts.formatRequestMessage || function (data) {
     return util.format('  <-- %s %s',
-                       this.request.method, this.request.originalUrl);
+      this.request.method, this.request.originalUrl);
   };
 
   var formatResponseMessage = opts.formatResponseMessage || function (data) {
     return util.format('  --> %s %s %d %sms',
-                       this.request.method, this.request.originalUrl,
-                       this.status, data[durationField]);
+      this.request.method, this.request.originalUrl,
+      this.status, data[durationField]);
   };
 
-  return function *requestLogger(next) {
+  return function* requestLogger(next) {
     var url = this.url;
+    if (Array.isArray(opts.ignorePath) && opts.ignorePath.includes(this.path)) {
+      return yield* next;
+    }
 
     var requestData = {
       req: this.req
@@ -152,19 +156,19 @@ module.exports.requestLogger = function (opts) {
 
       responseData = updateFields(this, opts.updateLogFields, responseData);
       responseData = updateFields(this, opts.updateResponseLogFields,
-                                  responseData, err);
+        responseData, err);
 
       var level = levelFn.call(this, this.status, err);
 
       this.log[level](responseData,
-                      formatResponseMessage.call(this, responseData));
+        formatResponseMessage.call(this, responseData));
 
       // Remove log object to mitigate accidental leaks
       this.log = null;
     };
 
     try {
-      yield *next; // jshint ignore:line
+      yield* next; // jshint ignore:line
     } catch (e) {
       err = e;
     } finally {
@@ -179,7 +183,7 @@ module.exports.requestLogger = function (opts) {
   };
 };
 
-function updateFields (ctx, func, data, err) {
+function updateFields(ctx, func, data, err) {
   if (!func) return data;
 
   try {
@@ -213,7 +217,7 @@ module.exports.timeContext = function (opts) {
   var logLevel = opts.logLevel || 'trace';
   var updateLogFields = opts.updateLogFields;
 
-  return function *timeContext(next) {
+  return function* timeContext(next) {
     this._timeContextStartTimes = {};
 
     this.time = time;
@@ -222,7 +226,7 @@ module.exports.timeContext = function (opts) {
     yield* next; // jshint ignore:line
   };
 
-  function time (label) {
+  function time(label) {
     /*jshint validthis:true */
     var startTimes = this._timeContextStartTimes;
 
@@ -233,7 +237,7 @@ module.exports.timeContext = function (opts) {
     startTimes[label] = new Date().getTime();
   }
 
-  function timeEnd (label) {
+  function timeEnd(label) {
     /*jshint validthis:true */
     var startTimes = this._timeContextStartTimes;
     var startTime = startTimes[label];

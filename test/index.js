@@ -12,11 +12,11 @@ describe('koaBunyanLogger', function () {
   var server;
   var ringBuffer;
 
-  beforeEach(function *() {
+  beforeEach(function* () {
     app = koa();
-    app.on('error', function () {}); // suppress errors
+    app.on('error', function () { }); // suppress errors
 
-    ringBuffer = new bunyan.RingBuffer({limit: 100});
+    ringBuffer = new bunyan.RingBuffer({ limit: 100 });
     ringLogger = bunyan.createLogger({
       name: 'test',
       streams: [{
@@ -27,7 +27,7 @@ describe('koaBunyanLogger', function () {
     });
   });
 
-  afterEach(function *() {
+  afterEach(function* () {
     if (server) {
       server.close();
     }
@@ -49,13 +49,17 @@ describe('koaBunyanLogger', function () {
     return ringBuffer.records[i];
   };
 
-  var helloWorld = function *() {
+  var helloWorld = function* () {
     this.body = 'Hello world';
   };
 
-  it('creates a default logger', function *() {
+  var pingResponse = function* () {
+    this.body = 'ping';
+  }
+
+  it('creates a default logger', function* () {
     app.use(koaBunyanLogger());
-    app.use(function *() {
+    app.use(function* () {
       assert.ok(this.log);
       this.body = '';
     });
@@ -63,10 +67,10 @@ describe('koaBunyanLogger', function () {
     yield request().get('/').expect(200).end();
   });
 
-  it('can log simple requests', function * () {
+  it('can log simple requests', function* () {
     app.use(koaBunyanLogger(ringLogger));
 
-    app.use(function *() {
+    app.use(function* () {
       this.log.info('Got request');
       this.body = 'Hello world';
     });
@@ -80,18 +84,18 @@ describe('koaBunyanLogger', function () {
     var REQ_MESSAGE = /  <-- GET \//;
     var RES_MESSAGE = /  --> GET \/ \d+ \d+ms/;
 
-    beforeEach(function *() {
+    beforeEach(function* () {
       app.use(koaBunyanLogger(ringLogger));
     });
 
-    function checkRequestResponse (status) {
+    function checkRequestResponse(status) {
       assert.equal(ringBuffer.records.length, 2);
       assert.ok(record(0).msg.match(REQ_MESSAGE));
       assert.ok(record(1).msg.match(RES_MESSAGE));
       assert.equal(record(1).res.statusCode, status);
     }
 
-    it('logs requests', function *() {
+    it('logs requests', function* () {
       app.use(koaBunyanLogger.requestLogger());
       app.use(helloWorld);
 
@@ -100,10 +104,20 @@ describe('koaBunyanLogger', function () {
       checkRequestResponse(200);
     });
 
-    it('logs 404 errors', function *() {
+    it('ignore logs requests', function* () {
+      app.use(koaBunyanLogger.requestLogger({ ignorePath: ['/ping'] }));
+      app.use(pingResponse);
+
+      yield request().get('/ping?t=xxx').expect(200).end();
+
+      assert.equal(ringBuffer.records.length, 0);
+    });
+
+
+    it('logs 404 errors', function* () {
       app.use(koaBunyanLogger.requestLogger());
 
-      app.use(function *() {
+      app.use(function* () {
         this.throw(404);
       });
 
@@ -112,10 +126,10 @@ describe('koaBunyanLogger', function () {
       checkRequestResponse(404);
     });
 
-    it('logs 500 errors', function *() {
+    it('logs 500 errors', function* () {
       app.use(koaBunyanLogger.requestLogger());
 
-      app.use(function *() {
+      app.use(function* () {
         throw new Error('oh no');
       });
 
@@ -124,7 +138,7 @@ describe('koaBunyanLogger', function () {
       checkRequestResponse(500);
     });
 
-    it('allows adding fields to request/response log data', function *() {
+    it('allows adding fields to request/response log data', function* () {
       app.use(koaBunyanLogger.requestLogger({
         updateLogFields: function (fields) {
           fields.foo = 'bar';
@@ -147,7 +161,7 @@ describe('koaBunyanLogger', function () {
         }
       }));
 
-      app.use(function *() {
+      app.use(function* () {
         throw new Error('uh oh');
       });
 
@@ -166,7 +180,7 @@ describe('koaBunyanLogger', function () {
       assert.equal(record(1).error_handled, true);
     });
 
-    it('logs errors in update methods and then continues', function *() {
+    it('logs errors in update methods and then continues', function* () {
       app.use(koaBunyanLogger.requestLogger({
         updateResponseLogFields: function (fields) {
           throw new Error('clumsy');
@@ -190,30 +204,30 @@ describe('koaBunyanLogger', function () {
   });
 
   describe('koaBunyanLogger.requestIdContext', function () {
-    it('throws an exception if this.log is not available', function *() {
+    it('throws an exception if this.log is not available', function* () {
       app.use(koaBunyanLogger.requestIdContext());
       yield request().get('/').expect(500).end();
     });
 
-    it('adds req_id from X-Request-Header to log messages', function *() {
+    it('adds req_id from X-Request-Header to log messages', function* () {
       app.use(koaBunyanLogger(ringLogger));
       app.use(koaBunyanLogger.requestIdContext());
 
-      app.use(function *() {
+      app.use(function* () {
         this.log.info('hello world');
         this.body = "";
       });
 
-      yield request().get('/').set({'X-Request-Id': '1234'}).expect(200).end();
+      yield request().get('/').set({ 'X-Request-Id': '1234' }).expect(200).end();
 
       assert.equal(ringBuffer.records[0].req_id, '1234');
     });
 
-    it('adds generated req_id to log messages if there is no header', function *() {
+    it('adds generated req_id to log messages if there is no header', function* () {
       app.use(koaBunyanLogger(ringLogger));
       app.use(koaBunyanLogger.requestIdContext());
 
-      app.use(function *() {
+      app.use(function* () {
         this.log.info('hello world');
         this.body = "";
       });
@@ -225,11 +239,11 @@ describe('koaBunyanLogger', function () {
   });
 
   describe('koaBunyanLogger.timeContext', function () {
-    it('records the time between time() and timeEnd()', function *() {
+    it('records the time between time() and timeEnd()', function* () {
       app.use(koaBunyanLogger(ringLogger));
       app.use(koaBunyanLogger.timeContext());
 
-      app.use(function *() {
+      app.use(function* () {
         this.time('foo');
         this.timeEnd('foo');
         this.body = '';
@@ -240,11 +254,11 @@ describe('koaBunyanLogger', function () {
       assert.equal(typeof ringBuffer.records[0].duration, 'number');
     });
 
-    it('handles nested calls to time()', function *() {
+    it('handles nested calls to time()', function* () {
       app.use(koaBunyanLogger(ringLogger));
       app.use(koaBunyanLogger.timeContext());
 
-      app.use(function *() {
+      app.use(function* () {
         this.time('foo');
         this.time('bar');
         this.timeEnd('bar');
@@ -259,11 +273,11 @@ describe('koaBunyanLogger', function () {
       assert.equal(typeof ringBuffer.records[1].duration, 'number');
     });
 
-    it('warns if time() is called twice for the same label', function *() {
+    it('warns if time() is called twice for the same label', function* () {
       app.use(koaBunyanLogger(ringLogger));
       app.use(koaBunyanLogger.timeContext());
 
-      app.use(function *() {
+      app.use(function* () {
         this.time('x');
         this.time('x');
         this.body = '';
@@ -274,11 +288,11 @@ describe('koaBunyanLogger', function () {
       assert.ok(ringBuffer.records[0].msg.match(/called for previously/));
     });
 
-    it('warns if timeEnd(label) is called without time(label)', function *() {
+    it('warns if timeEnd(label) is called without time(label)', function* () {
       app.use(koaBunyanLogger(ringLogger));
       app.use(koaBunyanLogger.timeContext());
 
-      app.use(function *() {
+      app.use(function* () {
         this.timeEnd('blam');
         this.body = '';
       });
@@ -288,7 +302,7 @@ describe('koaBunyanLogger', function () {
       assert.ok(ringBuffer.records[0].msg.match(/called without/));
     });
 
-    it('allows returning custom log fields', function *() {
+    it('allows returning custom log fields', function* () {
       app.use(koaBunyanLogger(ringLogger));
       app.use(koaBunyanLogger.timeContext({
         updateLogFields: function (fields) {
@@ -301,7 +315,7 @@ describe('koaBunyanLogger', function () {
         }
       }));
 
-      app.use(function *() {
+      app.use(function* () {
         this.time('foo');
         this.timeEnd('foo');
         this.body = '';
