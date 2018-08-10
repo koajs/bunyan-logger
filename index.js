@@ -125,6 +125,9 @@ module.exports.requestLogger = function (opts) {
 
   return function requestLogger(ctx, next) {
     var url = ctx.url;
+    if (Array.isArray(opts.ignorePath) && opts.ignorePath.includes(ctx.path)) {
+      return next();
+    }
 
     var requestData = {
       req: ctx.req

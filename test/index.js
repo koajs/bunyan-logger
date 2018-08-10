@@ -53,6 +53,10 @@ describe('koaBunyanLogger', function () {
     ctx.body = 'Hello world';
   };
 
+  var pingResponse = function (ctx) {
+    ctx.body = 'ping';
+  };
+
   it('creates a default logger', function *() {
     app.use(koaBunyanLogger());
     app.use(function (ctx) {
@@ -98,6 +102,13 @@ describe('koaBunyanLogger', function () {
       yield request().get('/').expect(200).end();
 
       checkRequestResponse(200);
+    });
+
+    it('ignore logs requests', function* () {
+      app.use(koaBunyanLogger.requestLogger({ ignorePath: ['/ping'] }));
+      app.use(pingResponse);
+       yield request().get('/ping?t=xxx').expect(200).end();
+       assert.equal(ringBuffer.records.length, 0);
     });
 
     it('logs 404 errors', function *() {
