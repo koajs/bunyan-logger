@@ -34,9 +34,9 @@
     "co-mocha": "~1.1.2",
     "co-supertest": "~0.0.10",
     "istanbul": "~0.4.0",
-    "jshint": "~2.5.8",
+    "jshint": "^2.9.6",
     "koa": "^2.0.0",
-    "mocha": "~2.3.3",
-    "supertest": "~1.1.0"
+    "mocha": "^5.2.0",
+    "supertest": "^3.3.0"
   }
 }
