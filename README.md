@@ -91,6 +91,14 @@ Server output:
     }
 ```
 
+### Ignoring specific path from logging
+
+It is possible to skip logs from some endpoints with `ignorePath` option.
+
+```js
+app.use(koaBunyanLogger.requestLogger({ ignorePath: ['/ping'] }))
+```
+
 ### Suppressing default error stack traces
 
 To ensure that stack traces from request handling don't get logged in their
