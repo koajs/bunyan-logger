@@ -26,12 +26,12 @@
   "author": "Pebble Technology <webteam@getpebble.com>",
   "license": "MIT",
   "dependencies": {
-    "bunyan": "~1.5.0",
-    "on-finished": "~2.1.1",
+    "bunyan": "~1.8.12",
+    "on-finished": "~2.3.0",
     "uuid": "^3.0.0"
   },
   "devDependencies": {
-    "co-mocha": "~1.1.2",
+    "co-mocha": "~1.2.2",
     "co-supertest": "~0.0.10",
     "istanbul": "~0.4.0",
     "jshint": "^2.9.6",
