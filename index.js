@@ -16,7 +16,7 @@ const updateFields = (ctx, func, data, err) => {
     ctx.log.error(e);
     return data;
   }
-}
+};
 
 /*
  * If logger is a bunyan logger instance, return it;
@@ -32,7 +32,7 @@ const createOrUseLogger = logger => {
   }
 
   return logger;
-}
+};
 
 /*
  * Koa middleware that adds this.log property to the koa context
@@ -46,7 +46,7 @@ const createOrUseLogger = logger => {
 module.exports = loggerInstance => {
   loggerInstance = createOrUseLogger(loggerInstance);
 
-  return logger = (ctx, next) => {
+  return (ctx, next) => {
     ctx.log = loggerInstance;
 
     return next();
@@ -76,7 +76,7 @@ module.exports.requestIdContext = opts => {
   const logField = opts.field || 'req_id';
   let fallbackLogger;
 
-  return requestIdContext = (ctx, next) => {
+  return (ctx, next) => {
     const reqId = ctx.request.get(header) || uuid.v4();
 
     ctx[ctxProp] = reqId;
@@ -136,7 +136,7 @@ module.exports.requestLogger = opts => {
                        this.status, data[durationField]);
   };
 
-  return requestLogger = (ctx, next) => {
+  return (ctx, next) => {
     const url = ctx.url;
     if (Array.isArray(opts.ignorePath) && opts.ignorePath.includes(ctx.path)) {
       return next();
@@ -212,7 +212,7 @@ module.exports.timeContext = opts => {
   const logLevel = opts.logLevel || 'trace';
   const updateLogFields = opts.updateLogFields;
 
-  return timeContext = (ctx, next) => {
+  return (ctx, next) => {
     ctx._timeContextStartTimes = {};
 
     ctx.time = time;
