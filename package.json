@@ -1,6 +1,6 @@
 {
   "name": "koa-bunyan-logger",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Koa middleware for logging requests using bunyan",
   "main": "index.js",
   "engines": {
