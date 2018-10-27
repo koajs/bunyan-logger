@@ -25,7 +25,7 @@ var app = koa();
 app.use(koaBunyanLogger());
 
 app.use(function (ctx, next) {
-  ctx.log.info({'Got a request from %s for %s', ctx.request.ip, ctx.path);
+  ctx.log.info('Got a request from %s for %s', ctx.request.ip, ctx.path);
   return next();
 });
 
