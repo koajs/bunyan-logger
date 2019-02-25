@@ -1,4 +1,17 @@
 
+2.1.0 / 2018-10-04
+==================
+
+  * ci: Add eslint-config, use only .travis.yml
+  * style: Fix linter problems
+  * update package-lock
+  * refactor: Use async, const-let style, remove generators
+  * chore: Update deps
+  * chore: Fix vulnerabilities with npm audit
+  * chore: Add package-lock.json
+  * feat: Add ignorePath options
+  * Merge pull request #25 from koajs/2x
+
 2.0.0 / 2017-04-14
 ==================
 
