@@ -61,7 +61,6 @@ module.exports.requestIdContext = function (opts) {
   var ctxProp = opts.prop || 'reqId';
   var requestProp = opts.requestProp || 'reqId';
   var logField = opts.field || 'req_id';
-  var fallbackLogger;
 
   return function requestIdContext(ctx, next) {
     var reqId = ctx.request.get(header) || uuid.v4();
@@ -124,7 +123,6 @@ module.exports.requestLogger = function (opts) {
   };
 
   return function requestLogger(ctx, next) {
-    var url = ctx.url;
     if (Array.isArray(opts.ignorePath) && opts.ignorePath.includes(ctx.path)) {
       return next();
     }
