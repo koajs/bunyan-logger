@@ -18,10 +18,10 @@ remaining relatively lightweight, leaving advanced functionality and
 customization the app.
 
 ```js
-var koa = require('koa');
-var koaBunyanLogger = require('koa-bunyan-logger');
+const koa = require('koa');
+const koaBunyanLogger = require('koa-bunyan-logger');
 
-var app = koa();
+const app = koa();
 app.use(koaBunyanLogger());
 
 app.use(function (ctx, next) {
@@ -120,10 +120,10 @@ Parameters:
 Use an existing logger:
 
 ```js
-var bunyan = require('bunyan');
-var koaBunyanLogger = require('koa-bunyan-logger');
+const bunyan = require('bunyan');
+const koaBunyanLogger = require('koa-bunyan-logger');
 
-var appLogger = bunyan.createLogger({
+const appLogger = bunyan.createLogger({
   name: 'myapp',
   level: 'debug',
   serializers: bunyan.stdSerializers
@@ -135,7 +135,7 @@ app.use(koaBunyanLogger(appLogger));
 Shortcut to create a new logger:
 
 ```js
-var koaBunyanLogger = require('koa-bunyan-logger');
+const koaBunyanLogger = require('koa-bunyan-logger');
 
 app.use(koaBunyanLogger({
   name: 'myapp',
@@ -219,7 +219,7 @@ Options:
 #### Examples
 
 ```js
-var koaBunyanLogger = require('koa-bunyan-logger');
+const koaBunyanLogger = require('koa-bunyan-logger');
 
 app.use(koaBunyanLogger());
 app.use(koaBunyanLogger.requestIdContext());
@@ -228,7 +228,7 @@ app.use(koaBunyanLogger.requestIdContext());
 Or use a different header:
 
 ```js
-var koaBunyanLogger = require('koa-bunyan-logger');
+const koaBunyanLogger = require('koa-bunyan-logger');
 
 app.use(koaBunyanLogger());
 app.use(koaBunyanLogger.requestIdContext({
@@ -239,7 +239,7 @@ app.use(koaBunyanLogger.requestIdContext({
 By default, the request id will be accessible as this.reqId and this.request.reqId:
 
 ```js
-var koaBunyanLogger = require('koa-bunyan-logger');
+const koaBunyanLogger = require('koa-bunyan-logger');
 
 app.use(koaBunyanLogger());
 app.use(koaBunyanLogger.requestIdContext());
@@ -268,7 +268,7 @@ Options:
 #### Examples
 
 ```js
-var koaBunyanLogger = require('koa-bunyan-logger');
+const koaBunyanLogger = require('koa-bunyan-logger');
 
 app.use(koaBunyanLogger());
 app.use(koaBunyanLogger.requestIdContext());
@@ -297,7 +297,7 @@ app.use(function (ctx) {
 The same but using async functions
 
 ```js
-var koaBunyanLogger = require('koa-bunyan-logger');
+const koaBunyanLogger = require('koa-bunyan-logger');
 
 app.use(koaBunyanLogger());
 app.use(koaBunyanLogger.requestIdContext());
@@ -325,7 +325,7 @@ To return different fields, such as nesting the data under
 a single field, add a `updateLogFields` function to the options:
 
 ```js
-var koaBunyanLogger = require('koa-bunyan-logger');
+const koaBunyanLogger = require('koa-bunyan-logger');
 
 app.use(koaBunyanLogger());
 app.use(koaBunyanLogger.requestIdContext());
@@ -346,8 +346,8 @@ app.use(koaBunyanLogger.timeContext({
 The internal copy of bunyan is exported as `.bunyan`:
 
 ```js
-var koaBunyanLogger = require('koa-bunyan-logger');
-var bunyan = koaBunyanLogger.bunyan;
+const koaBunyanLogger = require('koa-bunyan-logger');
+const bunyan = koaBunyanLogger.bunyan;
 ```
 
 ## Sponsored by
