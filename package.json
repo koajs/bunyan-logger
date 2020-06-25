@@ -28,7 +28,7 @@
   "author": "Pebble Technology <webteam@getpebble.com>",
   "license": "MIT",
   "dependencies": {
-    "bunyan": "~1.8.12",
+    "bunyan": "~1.8.13",
     "on-finished": "~2.3.0",
     "uuid": "^3.0.0"
   },
