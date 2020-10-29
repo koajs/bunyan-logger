@@ -1,8 +1,8 @@
 # bunyan-logger
 
-> A Koa team member [@niftylettuce](https://github.com/niftylettuce) has released a full-featured logging package alternative, check it out at <https://cabinjs.com>!**
+> **Update:** Koa team member [@niftylettuce](https://github.com/niftylettuce) released a logging package alternative at <https://cabinjs.com>!
 
-NOTE that you're reading the README of the version which targets [Koa v2.x](https://github.com/koajs/koa/tree/v2.x), if you want to read about the old 1.X version, switch to Tag 1.3.0.
+**NOTE:** that you're reading the README of the version which targets [Koa v2.x](https://github.com/koajs/koa/tree/v2.x), if you want to read about the old 1.X version, switch to Tag 1.3.0.
 
 Flexible log context and request logging middleware
 for [koa](http://koajs.com/) using [bunyan](https://github.com/trentm/node-bunyan).
