@@ -1,3 +1,2 @@
-extends: sexy
-env:
-  node: true
+root: true
+extends: standard
