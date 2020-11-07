@@ -4,12 +4,13 @@
   "description": "Koa middleware for logging requests using bunyan",
   "main": "index.js",
   "engines": {
-    "node": ">= 4.x"
+    "node": ">= 10"
   },
   "scripts": {
-    "test": "mocha",
-    "test:coverage": "npx istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
-    "lint": "eslint index.js"
+    "lint": "eslint .",
+    "test": "mocha --exit",
+    "test-cov": "nyc npm run test",
+    "ci": "rimraf .nyc_output coverage && npm run lint && npm run test-cov"
   },
   "keywords": [
     "koa",
@@ -28,17 +29,21 @@
   "author": "Pebble Technology <webteam@getpebble.com>",
   "license": "MIT",
   "dependencies": {
-    "bunyan": "~1.8.12",
+    "bunyan": "~1.8.14",
     "on-finished": "~2.3.0",
-    "uuid": "^3.0.0"
+    "uuid": "^8.3.1"
   },
   "devDependencies": {
-    "coveralls": "^3.0.2",
-    "eslint": "^5.6.1",
-    "eslint-config-sexy": "^5.0.0",
-    "istanbul": "^0.4.5",
-    "koa": "^2.0.0",
-    "mocha": "^5.2.0",
-    "supertest": "^3.3.0"
+    "eslint": "^7.12.1",
+    "eslint-config-standard": "^16.0.1",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.2",
+    "koa": "^2.13.0",
+    "mocha": "^8.2.1",
+    "nyc": "^15.1.0",
+    "rimraf": "^3.0.2",
+    "supertest": "^6.0.1"
   }
 }
