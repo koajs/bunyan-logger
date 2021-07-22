@@ -29,9 +29,9 @@
   "author": "Pebble Technology <webteam@getpebble.com>",
   "license": "MIT",
   "dependencies": {
-    "bunyan": "~1.8.14",
-    "on-finished": "~2.3.0",
-    "uuid": "^8.3.1"
+    "bunyan": "^1.8.15",
+    "on-finished": "^2.3.0",
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "eslint": "^7.12.1",
