@@ -1,38 +1,38 @@
-const bunyan = require('bunyan');
-const uuid = require('uuid');
-const util = require('util');
-const onFinished = require('on-finished');
+const bunyan = require('bunyan')
+const uuid = require('uuid')
+const util = require('util')
+const onFinished = require('on-finished')
 
 const updateFields = (ctx, func, data, err) => {
-  if (!func) return data;
+  if (!func) return data
 
   try {
     if (err) {
-      return func.call(ctx, data, err) || data;
+      return func.call(ctx, data, err) || data
     }
-    return func.call(ctx, data) || data;
 
+    return func.call(ctx, data) || data
   } catch (e) {
-    ctx.log.error(e);
-    return data;
+    ctx.log.error(e)
+    return data
   }
-};
+}
 
 /*
- * If logger is a bunyan logger instance, return it;
+ * If logger is a bunyan logger instance, return it
  * otherwise, create a new logger with some reasonable defaults.
  */
 const createOrUseLogger = (logger) => {
   if (!logger || !logger.info || !logger.child) {
-    const loggerOpts = logger || {};
-    loggerOpts.name = loggerOpts.name || 'koa';
-    loggerOpts.serializers = loggerOpts.serializers || bunyan.stdSerializers;
+    const loggerOpts = logger || {}
+    loggerOpts.name = loggerOpts.name || 'koa'
+    loggerOpts.serializers = loggerOpts.serializers || bunyan.stdSerializers
 
-    logger = bunyan.createLogger(loggerOpts);
+    logger = bunyan.createLogger(loggerOpts)
   }
 
-  return logger;
-};
+  return logger
+}
 
 /*
  * Koa middleware that adds this.log property to the koa context
@@ -44,14 +44,14 @@ const createOrUseLogger = (logger) => {
  *                    specified, a default logger will be used.
  */
 module.exports = (loggerInstance) => {
-  loggerInstance = createOrUseLogger(loggerInstance);
+  loggerInstance = createOrUseLogger(loggerInstance)
 
   return (ctx, next) => {
-    ctx.log = loggerInstance;
+    ctx.log = loggerInstance
 
-    return next();
-  };
-};
+    return next()
+  }
+}
 
 /*
  * Koa middleware that gets a unique request id from a header or
@@ -68,31 +68,31 @@ module.exports = (loggerInstance) => {
  *    - field: log field name for bunyan (default 'req_id')
  */
 module.exports.requestIdContext = (opts) => {
-  opts = opts || {};
+  opts = opts || {}
 
-  const header = opts.header || 'X-Request-Id';
-  const ctxProp = opts.prop || 'reqId';
-  const requestProp = opts.requestProp || 'reqId';
-  const logField = opts.field || 'req_id';
+  const header = opts.header || 'X-Request-Id'
+  const ctxProp = opts.prop || 'reqId'
+  const requestProp = opts.requestProp || 'reqId'
+  const logField = opts.field || 'req_id'
 
   return (ctx, next) => {
-    const reqId = ctx.request.get(header) || uuid.v4();
+    const reqId = ctx.request.get(header) || uuid.v4()
 
-    ctx[ctxProp] = reqId;
-    ctx.request[requestProp] = reqId;
+    ctx[ctxProp] = reqId
+    ctx.request[requestProp] = reqId
 
-    const logFields = {};
-    logFields[logField] = reqId;
+    const logFields = {}
+    logFields[logField] = reqId
 
     if (!ctx.log) {
-      throw new Error('must use(koaBunyanLogger()) before this middleware');
+      throw new Error('must use(koaBunyanLogger()) before this middleware')
     }
 
-    ctx.log = ctx.log.child(logFields);
+    ctx.log = ctx.log.child(logFields)
 
-    return next();
-  };
-};
+    return next()
+  }
+}
 
 /*
  * Logs requests and responses.
@@ -110,86 +110,86 @@ module.exports.requestIdContext = (opts) => {
  *    - formatResponseMessage: function (responseData)
  */
 module.exports.requestLogger = (opts) => {
-  opts = opts || {};
+  opts = opts || {}
 
   const levelFn = opts.levelFn || function (status) {
     if (status >= 500) {
-      return 'error';
+      return 'error'
     } if (status >= 400) {
-      return 'warn';
+      return 'warn'
     }
-    return 'info';
 
-  };
+    return 'info'
+  }
 
-  const durationField = opts.durationField || 'duration';
+  const durationField = opts.durationField || 'duration'
 
   const formatRequestMessage = opts.formatRequestMessage || function () {
     return util.format('  <-- %s %s',
-      this.request.method, this.request.originalUrl);
-  };
+      this.request.method, this.request.originalUrl)
+  }
 
   const formatResponseMessage = opts.formatResponseMessage || function (data) {
     return util.format('  --> %s %s %d %sms',
       this.request.method, this.request.originalUrl,
-      this.status, data[durationField]);
-  };
+      this.status, data[durationField])
+  }
 
   return (ctx, next) => {
     if (Array.isArray(opts.ignorePath) && opts.ignorePath.includes(ctx.path)) {
-      return next();
+      return next()
     }
 
     let requestData = {
       req: ctx.req
-    };
+    }
 
-    requestData = updateFields(ctx, opts.updateLogFields, requestData);
-    requestData = updateFields(ctx, opts.updateRequestLogFields, requestData);
+    requestData = updateFields(ctx, opts.updateLogFields, requestData)
+    requestData = updateFields(ctx, opts.updateRequestLogFields, requestData)
 
-    ctx.log.info(requestData, formatRequestMessage.call(ctx, requestData));
+    ctx.log.info(requestData, formatRequestMessage.call(ctx, requestData))
 
-    const startTime = new Date().getTime();
-    let err;
+    const startTime = new Date().getTime()
+    let err
 
     const onResponseFinished = () => {
       let responseData = {
         req: ctx.req,
         res: ctx.res
-      };
-
-      if (err) {
-        responseData.err = err;
       }
 
-      responseData[durationField] = Date.now() - startTime;
+      if (err) {
+        responseData.err = err
+      }
 
-      responseData = updateFields(ctx, opts.updateLogFields, responseData);
+      responseData[durationField] = Date.now() - startTime
+
+      responseData = updateFields(ctx, opts.updateLogFields, responseData)
       responseData = updateFields(ctx, opts.updateResponseLogFields,
-        responseData, err);
+        responseData, err)
 
-      const level = levelFn.call(ctx, ctx.status, err);
+      const level = levelFn.call(ctx, ctx.status, err)
 
       ctx.log[level](responseData,
-        formatResponseMessage.call(ctx, responseData));
+        formatResponseMessage.call(ctx, responseData))
 
       // Remove log object to mitigate accidental leaks
-      ctx.log = null;
-    };
+      ctx.log = null
+    }
 
     return next().catch((e) => {
-      err = e;
+      err = e
     }).then(() => { // Emulate a finally
       // Handle response logging and cleanup when request is finished
       // This ensures that the default error handler is done
-      onFinished(ctx.response.res, onResponseFinished.bind(ctx));
+      onFinished(ctx.response.res, onResponseFinished.bind(ctx))
 
       if (err) {
-        throw err; // rethrow
+        throw err // rethrow
       }
-    });
-  };
-};
+    })
+  }
+}
 
 /**
  * Middleware which adds methods this.time(label) and this.timeEnd(label)
@@ -197,62 +197,62 @@ module.exports.requestLogger = (opts) => {
  *
  * Parameters:
  * - opts: object with the following optional properties
- *   - logLevel: name of log level to use; defaults to 'trace'
+ *   - logLevel: name of log level to use defaults to 'trace'
  *   - updateLogFields: function which will be called with
- *     arguments (fields) in koa context; can update fields or
+ *     arguments (fields) in koa context can update fields or
  *     return a new object.
  *
  * Must use(koaBunyanLogger()) before using this middleware.
  */
 module.exports.timeContext = (opts) => {
-  opts = opts || {};
+  opts = opts || {}
 
-  const logLevel = opts.logLevel || 'trace';
-  const { updateLogFields } = opts;
+  const logLevel = opts.logLevel || 'trace'
+  const { updateLogFields } = opts
 
-  function time(label) {
+  function time (label) {
     /* jshint validthis:true */
-    const startTimes = this._timeContextStartTimes;
+    const startTimes = this._timeContextStartTimes
 
     if (startTimes[label]) {
-      this.log.warn('time() called for previously used label %s', label);
+      this.log.warn('time() called for previously used label %s', label)
     }
 
-    startTimes[label] = new Date().getTime();
+    startTimes[label] = new Date().getTime()
   }
 
-  function timeEnd(label) {
+  function timeEnd (label) {
     /* jshint validthis:true */
-    const startTimes = this._timeContextStartTimes;
-    const startTime = startTimes[label];
+    const startTimes = this._timeContextStartTimes
+    const startTime = startTimes[label]
 
     if (!startTime) { // whoops!
-      this.log.warn('timeEnd() called without time() for label %s', label);
-      return;
+      this.log.warn('timeEnd() called without time() for label %s', label)
+      return
     }
 
-    const duration = new Date().getTime() - startTime;
+    const duration = new Date().getTime() - startTime
     let fields = {
       label,
       duration,
       msg: `${label}: ${duration}ms`
-    };
+    }
 
-    fields = updateFields(this, updateLogFields, fields);
-    this.log[logLevel](fields);
+    fields = updateFields(this, updateLogFields, fields)
+    this.log[logLevel](fields)
 
-    startTimes[label] = null;
+    startTimes[label] = null
   }
 
   return (ctx, next) => {
-    ctx._timeContextStartTimes = {};
+    ctx._timeContextStartTimes = {}
 
-    ctx.time = time;
-    ctx.timeEnd = timeEnd;
+    ctx.time = time
+    ctx.timeEnd = timeEnd
 
-    return next();
-  };
-};
+    return next()
+  }
+}
 
 // Export our copy of bunyan
-module.exports.bunyan = bunyan;
+module.exports.bunyan = bunyan
