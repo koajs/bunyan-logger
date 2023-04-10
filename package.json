@@ -4,7 +4,7 @@
   "description": "Koa middleware for logging requests using bunyan",
   "main": "index.js",
   "engines": {
-    "node": ">= 10"
+    "node": ">= 14"
   },
   "scripts": {
     "lint": "eslint .",
@@ -30,20 +30,20 @@
   "license": "MIT",
   "dependencies": {
     "bunyan": "^1.8.15",
-    "on-finished": "^2.3.0",
+    "on-finished": "^2.4.1",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
-    "eslint": "^7.12.1",
-    "eslint-config-standard": "^16.0.1",
-    "eslint-plugin-import": "^2.22.1",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.2",
-    "koa": "^2.13.0",
-    "mocha": "^8.2.1",
+    "eslint-plugin-promise": "^4.3.1",
+    "eslint-plugin-standard": "^4.1.0",
+    "koa": "^2.14.1",
+    "mocha": "^10.2.0",
     "nyc": "^15.1.0",
     "rimraf": "^3.0.2",
-    "supertest": "^6.0.1"
+    "supertest": "^6.3.3"
   }
 }
